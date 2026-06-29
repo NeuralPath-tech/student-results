@@ -17,9 +17,6 @@
 <div class="container col-md-8">
     <div class="card main-card">
         <div class="header-section">
-            <img src="../WhatsApp Image 2026-06-29 at 3.33.59 AM.jpeg" alt="صورة 1" style="width: 100px; margin-bottom: 10px; border-radius: 5px;">
-            <img src="../WhatsApp Image 2026-06-29 at 3.34.00 AM.jpeg" alt="صورة 2" style="width: 100px; margin-bottom: 10px; border-radius: 5px;">
-            
             <h4>جامعة حلوان التكنولوجية الدولية</h4>
             <p>كلية التكنولوجيا بالقاهرة</p>
             <small>نظام استعلام نتائج الطلاب الإلكتروني</small>
@@ -32,9 +29,52 @@
                 </div>
                 <button type="submit" class="btn btn-custom w-100">عرض النتيجة الحالية 🔍</button>
             </form>
+
             {% if searched %}
-                {% endif %}
+                <div class="mt-4 p-3 border rounded">
+                    {% if result %}
+                        <h5>الاسم: {{ result.student_name }}</h5>
+                        <hr>
+                        <p><strong>التقدير العام:</strong> {{ result.gpa }} | <strong>الحالة:</strong> {{ result.status }}</p>
+                        <hr>
+                        <h6>المواد الدراسية:</h6>
+                        <ul class="list-group">
+                            {% for key, value in result.items() %}
+                                {% if key not in ['seat_no', 'student_name', 'gpa', 'status'] %}
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        <span>{{ key }}</span>
+                                        <span class="badge
+                                            {% if value == 'م' %} bg-success
+                                            {% elif value == 'جج' %} bg-primary
+                                            {% elif value == 'ج' %} bg-info
+                                            {% elif value == 'ض' %} bg-danger
+                                            {% else %} bg-secondary {% endif %}">
+                                            {{ value }}
+                                        </span>
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p class="text-danger">عذراً، لم يتم العثور على نتيجة لهذا الرقم.</p>
+                    {% endif %}
+                </div>
+            {% endif %}
         </div>
+    </div>
+
+    <div class="card main-card">
+        <div class="card-header bg-light">دليل دلالات الرموز | اللائحة الداخلية للكلية</div>
+        <table class="table table-bordered table-custom mb-0">
+            <thead>
+                <tr><th>الرمز</th><th>التقدير الفعلي</th><th>الرمز</th><th>التقدير الفعلي</th></tr>
+            </thead>
+            <tbody>
+                <tr><td>م</td><td>ممتاز</td><td>ج</td><td>جيد</td></tr>
+                <tr><td>جج</td><td>جيد جداً</td><td>ق</td><td>مقبول</td></tr>
+                <tr class="table-danger"><td colspan="4">ض: ضعيف / راسب</td></tr>
+            </tbody>
+        </table>
     </div>
 </div>
 </body>
