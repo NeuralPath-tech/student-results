@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>بوابة نتائج الطلاب | جامعة حلوان التكنولوجية الدولية</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #f4f6f9; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        .card-custom { border-radius: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); border: none; }
+        .btn-search { background-color: #1a375d; color: white; transition: 0.3s; }
+        .btn-search:hover { background-color: #bfa15f; color: white; }
+        .header-bg { background-color: #1a375d; color: white; padding: 25px; border-radius: 15px 15px 0 0; border-bottom: 4px solid #bfa15f; }
+        .logo-img { height: 80px; width: auto; object-fit: contain; background-color: white; padding: 4px; border-radius: 8px; }
+        .badge-custom { background-color: #1a375d; color: white; }
+        .grade-badge { font-weight: bold; font-size: 1.1rem; min-width: 50px; display: inline-block; }
+    </style>
+</head>
+<body>
+
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+
+            <div class="card card-custom bg-white mb-4">
+                <div class="header-bg">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <img src="{{ url_for('static', filename='university_logo.jpg') }}" alt="لوجو الجامعة" class="logo-img">
+                        <img src="{{ url_for('static', filename='college_logo.jpg') }}" alt="لوجو الكلية" class="logo-img">
+                    </div>
+                    <div class="text-center">
+                        <h4 class="fw-bold m-0">جامعة حلوان التكنولوجية الدولية</h4>
+                        <h5 class="fw-semibold mt-1 opacity-90">كلية التكنولوجيا بالقاهرة</h5>
+                        <p class="m-0 mt-2 text-warning opacity-75">نظام استعلام نتائج الطلاب الإلكتروني</p>
+                    </div>
+                </div>
+                <div class="card-body p-4">
+                    <form method="POST">
+                        <div class="mb-4">
+                            <label for="seat_no" class="form-label fw-bold text-secondary">برجاء إدخال رقم الجلوس للاستعلام:</label>
+                            <input type="text" class="form-control form-control-lg text-center fw-bold" id="seat_no" name="seat_no" placeholder="أدخل رقم الجلوس هنا" required>
+                        </div>
+                        <button type="submit" class="btn btn-search btn-lg w-100 fw-bold shadow-sm">عرض النتيجة الحالية 🔍</button>
+                    </form>
+                </div>
+            </div>
+
+            {% if searched %}
+                {% if result %}
+                    <div class="card card-custom p-4 bg-white border-top border-5 border-success mb-4">
+                        <div class="text-center mb-4">
+                            <h4 class="text-dark fw-bold mb-2">{{ result['student_name'] }}</h4>
+                            <span class="badge badge-custom px-4 py-2 fs-6">رقم الجلوس: {{ result['seat_no'] }}</span>
+                        </div>
+
+                        <table class="table table-striped table-bordered text-center align-middle shadow-sm">
+                            <thead class="text-white" style="background-color: #1a375d;">
+                                <tr>
+                                    <th style="width: 60%;">المادة الدراسية</th>
+                                    <th style="width: 40%;">التقدير</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for key, value in result.items() %}
+                                    {% if key not in ['seat_no', 'student_name', 'gpa', 'status'] %}
+                                        <tr>
+                                            <td class="fw-bold text-secondary text-start ps-4">{{ key }}</td>
+                                            <td>
+                                                {% if value == 'م' or 'امتياز' in value or 'ممتاز' in value %}
+                                                    <span class="badge bg-success text-white px-3 py-2 grade-badge">م</span>
+                                                {% elif value == 'جج' or 'جيد جدا' in value %}
+                                                    <span class="badge bg-primary text-white px-3 py-2 grade-badge">جج</span>
+                                                {% elif value == 'ج' or 'جيد' in value %}
+                                                    <span class="badge bg-info text-dark px-3 py-2 grade-badge">ج</span>
+                                                {% elif value == 'ق' or 'مقبول' in value %}
+                                                    <span class="badge bg-warning text-dark px-3 py-2 grade-badge">ق</span>
+                                                {% elif value == 'ض' or 'ضعيف' in value or 'راسب' in value %}
+                                                    <span class="badge bg-danger text-white px-3 py-2 grade-badge">ض</span>
+                                                {% else %}
+                                                    <span class="badge bg-light text-dark border px-3 py-2 grade-badge">{{ value }}</span>
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                    {% endif %}
+                                {% endfor %}
+
+                                <tr class="table-primary">
+                                    <td class="fw-bold fs-5 text-dark">التقدير العام</td>
+                                    <td class="fw-bold text-primary fs-5">{{ result['gpa'] }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-bold fs-5 text-dark">حالة الطالب</td>
+                                    <td>
+                                        {% if result['status'] in ['ن', 'ناجح'] or 'ناجح' in result['status'] %}
+                                            <span class="badge bg-success fs-5 px-4 py-2 w-100">ناجح 🎉</span>
+                                        {% else %}
+                                            <span class="badge bg-danger fs-5 px-4 py-2 w-100">راسب ⚠️</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="alert alert-danger text-center card-custom fw-bold p-3 fs-5 mb-4" role="alert">
+                        {{ error_msg }}
+                    </div>
+                {% endif %}
+            {% endif %}
+
+            <div class="card card-custom p-4 bg-white">
+                <h6 class="fw-bold text-secondary border-bottom pb-2 mb-3">📋 دليل دلالات رموز التقديرات (اللائحة الداخلية للكلية)</h6>
+                <div class="table-responsive">
+                    <table class="table table-bordered legend-table text-center align-middle m-0">
+                        <thead class="table-light text-secondary">
+                            <tr>
+                                <th style="width: 25%;">الاختصار / الرمز</th>
+                                <th style="width: 25%;">الشرح والتقدير الفعلي</th>
+                                <th style="width: 25%;">الاختصار / الرمز</th>
+                                <th style="width: 25%;">الشرح والتقدير الفعلي</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="fw-bold text-success fs-5">م</td>
+                                <td class="text-dark fw-semibold">ممتاز</td>
+                                <td class="fw-bold text-primary fs-5">ج</td>
+                                <td class="text-dark fw-semibold">جيد</td>
+                            </tr>
+                            <tr>
+                                <td class="fw-bold text-success fs-5">جج</td>
+                                <td class="text-dark fw-semibold">جيد جداً</td>
+                                <td class="fw-bold text-warning fs-5">ق</td>
+                                <td class="text-dark fw-semibold">مقبول</td>
+                            </tr>
+                            <tr class="table-danger opacity-75">
+                                <td class="fw-bold text-danger fs-5">ض</td>
+                                <td class="text-dark fw-semibold" colspan="3">ضعيف / راسب</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
